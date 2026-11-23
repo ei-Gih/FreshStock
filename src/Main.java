@@ -18,7 +18,7 @@ public class Main {
     private static final List<LoteProduto> lotes = new ArrayList<LoteProduto>();
     private static final MotorPrecificacao motor = new MotorPrecificacao();
     private static final ConsultorEstoqueIA consultor = new ConsultorEstoqueIA();
-    private static final ClienteGeminiIA gemini = new ClienteGeminiIA(consultor);
+    private static final ClienteIA clienteIA = new ClienteIA(consultor);
     private static final RegistroPrecificacao registro = new RegistroPrecificacao();
     private static int contadorLote = 0;
 
@@ -67,10 +67,10 @@ public class Main {
         System.out.println("FreshStock (DynamicFresh AI)");
         System.out.println("Dados inteligentes, produtos sempre frescos");
         System.out.println(linha());
-        if (gemini.isConfigurada()) {
-            System.out.println("IA: Gemini (" + gemini.getModelo() + ") com fallback para IA local.");
+        if (clienteIA.isConfigurada()) {
+            System.out.println("IA conectada, com análise local em caso de indisponibilidade.");
         } else {
-            System.out.println("IA: local (GEMINI_API_KEY não definida).");
+            System.out.println("IA: local (IA_API_KEY não definida).");
         }
         System.out.println("Carregados " + lotes.size() + " lotes e " + registro.tamanho() + " simulações iniciais.");
     }
@@ -217,10 +217,10 @@ public class Main {
     // ----------------------------------------------------------------- núcleo
 
     private static RegistroPrecificacao.Entrada processar(LoteProduto lote, HistoricoDemanda demanda,
-                                                          boolean usarGemini) {
+                                                          boolean usarIA) {
         ResultadoPrecificacao resultado = motor.calcular(lote, demanda);
-        String parecer = usarGemini
-                ? gemini.gerarParecer(lote, demanda, resultado)
+        String parecer = usarIA
+                ? clienteIA.gerarParecer(lote, demanda, resultado)
                 : consultor.gerarParecer(lote, demanda, resultado);
         return registro.registrar(resultado, parecer);
     }

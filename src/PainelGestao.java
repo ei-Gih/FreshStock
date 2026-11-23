@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.time.*;
 
-/** Alertas locais imediatos; Gemini complementa a análise sob demanda. */
+/** Alertas locais imediatos; A IA complementa a análise sob demanda. */
 public class PainelGestao extends JPanel {
     private final JPanel indicadores=new JPanel(new GridLayout(1,4,12,0));
     private final DefaultTableModel modelo=new DefaultTableModel(new String[]{"Prioridade / alertas","Produto / lote","Estoque","Validade","Temporada de demanda","Preço base","Sugestão","Ação recomendada"},0) {
@@ -39,7 +39,7 @@ public class PainelGestao extends JPanel {
         lista.add(new JLabel("Prioridades do dia — passe o mouse sobre uma célula para ler o texto completo"),BorderLayout.NORTH);
         lista.add(new JScrollPane(tabela),BorderLayout.CENTER);
         JPanel detalhes=new JPanel(new BorderLayout(0,6));detalhes.setOpaque(false);
-        detalhes.add(new JLabel("Consultor Gemini • parecer complementar (o botão acima consulta a IA)"),BorderLayout.NORTH);
+        detalhes.add(new JLabel("Consultor IA • parecer complementar (o botão acima consulta a IA)"),BorderLayout.NORTH);
         parecer.setFont(new Font("Segoe UI",Font.PLAIN,14));parecer.setMargin(new Insets(12,12,12,12));
         detalhes.add(new JScrollPane(parecer),BorderLayout.CENTER);
         lista.setMinimumSize(new Dimension(300,150));detalhes.setMinimumSize(new Dimension(300,150));

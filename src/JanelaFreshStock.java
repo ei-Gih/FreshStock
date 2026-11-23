@@ -28,7 +28,7 @@ public class JanelaFreshStock extends JFrame {
     private final List<LoteProduto> lotes = new ArrayList<>();
     private final RegistroPrecificacao historico = new RegistroPrecificacao();
     private final ConsultorEstoqueIA consultor = new ConsultorEstoqueIA();
-    private ClienteGeminiIA gemini = new ClienteGeminiIA(consultor);
+    private ClienteIA clienteIA = new ClienteIA(consultor);
 
     private BancoEstoque banco;
     private PainelGestao painelGestao;
@@ -281,23 +281,23 @@ public class JanelaFreshStock extends JFrame {
         areaDiagnosticoIA.setEditable(false);
         areaDiagnosticoIA.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
-        JButton configurar = new JButton("Configurar Gemini");
+        JButton configurar = new JButton("Configurar IA");
         topo.add(configurar);
         configurar.addActionListener(e -> {
             javax.swing.JPasswordField chave = new javax.swing.JPasswordField(28);
-            JTextField modelo = new JTextField(gemini.getModelo());
+            JTextField modelo = new JTextField();
             JPanel campos = new JPanel(new GridLayout(0, 1, 6, 6));
             campos.add(new JLabel("Chave da API (somente nesta sessão):"));
             campos.add(chave);
-            campos.add(new JLabel("Modelo Gemini:"));
+            campos.add(new JLabel("Modelo da IA (vazio = padrão):"));
             campos.add(modelo);
             if (JOptionPane.showConfirmDialog(this, campos, "Configurar IA",
                     JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 char[] segredo = chave.getPassword();
-                gemini = new ClienteGeminiIA(consultor, new String(segredo), modelo.getText());
+                clienteIA = new ClienteIA(consultor, new String(segredo), modelo.getText());
                 java.util.Arrays.fill(segredo, '\0');
                 chave.setText("");
-                areaDiagnosticoIA.setText(gemini.isConfigurada()
+                areaDiagnosticoIA.setText(clienteIA.isConfigurada()
                         ? "Chave configurada. Execute o diagnóstico para testar a conexão."
                         : "Sem chave: análise local ativa.");
             }
@@ -321,7 +321,7 @@ public class JanelaFreshStock extends JFrame {
         JButton atualizar = new JButton("Atualizar alertas");
         topo.add(atualizar);
         atualizar.addActionListener(e -> atualizarTabelasECombos());
-        areaDiagnosticoIA.setText("Os alertas acima são atualizados automaticamente. Cadastre seus lotes e configure o mínimo e a temporada na aba Lotes e Cadastro.\nClique em Executar Diagnóstico para receber o parecer complementar do Gemini.");
+        areaDiagnosticoIA.setText("Os alertas acima são atualizados automaticamente. Cadastre seus lotes e configure o mínimo e a temporada na aba Lotes e Cadastro.\nClique em Executar Diagnóstico para receber o parecer complementar da IA.");
         painelGestao = new PainelGestao(topo, areaDiagnosticoIA);
         return painelGestao;
     }
@@ -336,7 +336,7 @@ public class JanelaFreshStock extends JFrame {
             List<LoteProduto> selecionados, List<HistoricoDemanda> demandas) {
         botao.setEnabled(false);
         area.setText("Consultando... A janela continua disponível.\n");
-        final ClienteGeminiIA cliente = gemini;
+        final ClienteIA cliente = clienteIA;
         new javax.swing.SwingWorker<Void, RegistroPrecificacao.Entrada>() {
             protected Void doInBackground() {
                 for (int i = 0; i < selecionados.size(); i++) {

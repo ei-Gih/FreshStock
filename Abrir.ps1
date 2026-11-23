@@ -1,9 +1,9 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 try {
     Set-Location -LiteralPath $PSScriptRoot
-    if (Test-Path -LiteralPath '.gemini-key.xml') {
-        $cred = Import-Clixml -LiteralPath '.gemini-key.xml'
-        $env:GEMINI_API_KEY = $cred.GetNetworkCredential().Password
+    if (Test-Path -LiteralPath '.ia-key.xml') {
+        $cred = Import-Clixml -LiteralPath '.ia-key.xml'
+        $env:IA_API_KEY = $cred.GetNetworkCredential().Password
     }
     $java = (Get-Command javaw.exe -ErrorAction Stop).Source
     Start-Process -FilePath $java -ArgumentList '-Dfile.encoding=UTF-8 -jar FreshStock.jar' -WorkingDirectory $PSScriptRoot -WindowStyle Hidden

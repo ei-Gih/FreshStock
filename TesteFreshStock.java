@@ -21,7 +21,7 @@ public class TesteFreshStock {
         invalido(() -> new HistoricoDemanda(DayOfWeek.MONDAY, 24, 1, 2));
         invalido(() -> new HistoricoDemanda(DayOfWeek.MONDAY, 10, Double.NaN, 2));
         invalido(() -> new LoteProduto("x", "x", false, null, 1, 1, Double.POSITIVE_INFINITY, 2));
-        ClienteGeminiIA local = new ClienteGeminiIA(new ConsultorEstoqueIA(), "", "");
+        ClienteIA local = new ClienteIA(new ConsultorEstoqueIA(), "", "");
         verificar(local.gerarParecer(l,d,r).contains("IA Local"));
         final JanelaFreshStock[] janela = new JanelaFreshStock[1];
         SwingUtilities.invokeAndWait(() -> {
@@ -32,11 +32,11 @@ public class TesteFreshStock {
         SwingUtilities.invokeAndWait(() -> janela[0].dispose());
         System.out.println("OK: cálculo, urgência, decimais, validação, fallback e abertura da janela.");
         if (args.length > 0 && args[0].equals("--online")) {
-            Method consulta = ClienteGeminiIA.class.getDeclaredMethod("consultarGemini", String.class);
+            Method consulta = ClienteIA.class.getDeclaredMethod("consultarIA", String.class);
             consulta.setAccessible(true);
-            String texto = (String) consulta.invoke(new ClienteGeminiIA(new ConsultorEstoqueIA()), "Responda apenas OK");
+            String texto = (String) consulta.invoke(new ClienteIA(new ConsultorEstoqueIA()), "Responda apenas OK");
             verificar(!texto.trim().isEmpty());
-            System.out.println("OK: cliente Java/Gemini respondeu ao teste genérico, sem dados de estoque.");
+            System.out.println("OK: cliente Java/IA respondeu ao teste genérico, sem dados de estoque.");
         }
     }
 }
