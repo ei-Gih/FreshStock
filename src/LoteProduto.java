@@ -12,7 +12,19 @@ public class LoteProduto {
     private final String nomeProduto;
     private final boolean climaterico;
     private final LocalDate dataEntrada;
-    private final int diasValidadeRestantes;
+    private LocalDate dataValidade;
+    private int estoqueMinimo = 10;
+    private String temporada = "Normal";
+    public LocalDate getDataValidade() { return dataValidade; }
+    public void setDataValidade(LocalDate data) { dataValidade = java.util.Objects.requireNonNull(data); }
+    public int getEstoqueMinimo() { return estoqueMinimo; }
+    public String getTemporada() { return temporada; }
+    public void configurar(int minimo, String temporada) {
+        if (minimo < 0) throw new IllegalArgumentException("Mínimo não pode ser negativo.");
+        if (!java.util.Arrays.asList("Normal", "Alta demanda", "Baixa demanda").contains(temporada))
+            throw new IllegalArgumentException("Temporada inválida.");
+        this.estoqueMinimo = minimo; this.temporada = temporada;
+    }
     private int quantidadeEstoque;
     private final double precoCusto;
     private final double precoBase;
@@ -32,17 +44,17 @@ public class LoteProduto {
         if (quantidadeEstoque < 0) {
             throw new IllegalArgumentException("Quantidade em estoque não pode ser negativa.");
         }
-        if (precoCusto <= 0) {
+        if (!Double.isFinite(precoCusto) || precoCusto <= 0) {
             throw new IllegalArgumentException("Preço de custo deve ser maior que zero.");
         }
-        if (precoBase < precoCusto) {
+        if (!Double.isFinite(precoBase) || precoBase < precoCusto) {
             throw new IllegalArgumentException("Preço base não pode ser menor que o preço de custo.");
         }
         this.codigoLote = codigoLote.trim();
         this.nomeProduto = nomeProduto.trim();
         this.climaterico = climaterico;
         this.dataEntrada = (dataEntrada == null) ? LocalDate.now() : dataEntrada;
-        this.diasValidadeRestantes = diasValidadeRestantes;
+        this.dataValidade = LocalDate.now().plusDays(diasValidadeRestantes);
         this.quantidadeEstoque = quantidadeEstoque;
         this.precoCusto = precoCusto;
         this.precoBase = precoBase;
@@ -65,7 +77,7 @@ public class LoteProduto {
     }
 
     public int getDiasValidadeRestantes() {
-        return diasValidadeRestantes;
+        return (int) java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), dataValidade);
     }
 
     public int getQuantidadeEstoque() {
@@ -82,7 +94,7 @@ public class LoteProduto {
 
     /** Dias de validade "úteis": climatéricos perdem tempo biológico mais rápido. */
     public double getDiasValidadeEfetivos() {
-        return climaterico ? diasValidadeRestantes * REDUCAO_CLIMATERICO : diasValidadeRestantes;
+        return Math.max(0, getDiasValidadeRestantes()) * (climaterico ? REDUCAO_CLIMATERICO : 1);
     }
 
     public void registrarVenda(int unidades) {
@@ -108,6 +120,7 @@ public class LoteProduto {
     public LoteProduto comDiasValidade(int novosDias) {
         LoteProduto copia = new LoteProduto(codigoLote, nomeProduto, climaterico, dataEntrada,
                 novosDias, quantidadeEstoque, precoCusto, precoBase);
+        copia.configurar(estoqueMinimo, temporada);
         return copia;
     }
 }

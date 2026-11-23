@@ -26,9 +26,18 @@ public class MotorPrecificacao {
     }
 
     public ResultadoPrecificacao calcular(LoteProduto lote, HistoricoDemanda demanda) {
+        if (lote.getDiasValidadeRestantes() < 0)
+            throw new IllegalArgumentException("Produto vencido: retirar da venda.");
+        if (lote.getQuantidadeEstoque() == 0)
+            throw new IllegalArgumentException("Estoque esgotado: repor antes de precificar.");
         EstrategiaPrecificacao estrategia = escolherEstrategia(lote, demanda);
         double preco = estrategia.calcularPrecoAjustado(lote, demanda);
 
+        // Temporada representa demanda informada pelo gestor, não um calendário agrícola.
+        if (lote.getDiasValidadeRestantes() > 3) {
+            if ("Alta demanda".equals(lote.getTemporada())) preco *= 1.10;
+            if ("Baixa demanda".equals(lote.getTemporada())) preco *= 0.90;
+        }
         boolean liquidacao = (estrategia == urgenciaValidade);
         double piso = lote.getPrecoCusto() * (liquidacao ? PISO_LIQUIDACAO : MARGEM_MINIMA);
         double teto = lote.getPrecoBase() * TETO_SOBRE_BASE;

@@ -15,10 +15,10 @@ public class HistoricoDemanda {
         if (hora < 0 || hora > 23) {
             throw new IllegalArgumentException("Hora deve estar entre 0 e 23.");
         }
-        if (vendasPorHoraHistoricas < 0) {
+        if (!Double.isFinite(vendasPorHoraHistoricas) || vendasPorHoraHistoricas < 0) {
             throw new IllegalArgumentException("Vendas por hora não pode ser negativa.");
         }
-        if (metaVendasHora <= 0) {
+        if (!Double.isFinite(metaVendasHora) || metaVendasHora <= 0) {
             throw new IllegalArgumentException("Meta de vendas por hora deve ser maior que zero.");
         }
         this.diaSemana = diaSemana;

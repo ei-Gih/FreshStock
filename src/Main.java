@@ -23,6 +23,10 @@ public class Main {
     private static int contadorLote = 0;
 
     public static void main(String[] args) {
+        if (args.length == 0 || !"--terminal".equals(args[0])) {
+            JanelaFreshStock.main(args);
+            return;
+        }
         carregarDadosIniciais();
         exibirCabecalho();
 

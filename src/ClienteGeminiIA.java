@@ -11,7 +11,7 @@ public class ClienteGeminiIA {
 
     private static final String VAR_CHAVE = "GEMINI_API_KEY";
     private static final String VAR_MODELO = "GEMINI_MODEL";
-    private static final String MODELO_PADRAO = "gemini-2.5-flash";
+    private static final String MODELO_PADRAO = "gemini-flash-lite-latest";
     private static final String URL_BASE = "https://generativelanguage.googleapis.com/v1beta/models/";
     private static final int TIMEOUT_CONEXAO_MS = 5000;
     private static final int TIMEOUT_LEITURA_MS = 20000;
@@ -22,11 +22,13 @@ public class ClienteGeminiIA {
     private final String modelo;
 
     public ClienteGeminiIA(ConsultorEstoqueIA consultorLocal) {
+        this(consultorLocal, System.getenv(VAR_CHAVE), System.getenv(VAR_MODELO));
+    }
+
+    public ClienteGeminiIA(ConsultorEstoqueIA consultorLocal, String chave, String m) {
         this.consultorLocal = consultorLocal;
-        String chave = System.getenv(VAR_CHAVE);
         this.apiKey = (chave == null || chave.trim().isEmpty()) ? null : chave.trim();
 
-        String m = System.getenv(VAR_MODELO);
         if (m == null || !m.trim().matches("[A-Za-z0-9._-]+")) {
             m = MODELO_PADRAO;
         }
@@ -52,7 +54,7 @@ public class ClienteGeminiIA {
             return "[IA Gemini] " + texto;
         } catch (Exception e) {
             String motivo = (e.getMessage() == null || e.getMessage().isEmpty())
-                    ? e.getClass().getSimpleName() : e.getMessage();
+                    ? e.getClass().getSimpleName() : e.getMessage().replace(apiKey, "[chave protegida]");
             return "[IA Local | fallback: " + motivo + "] "
                     + consultorLocal.gerarTexto(lote, demanda, resultado);
         }
@@ -67,6 +69,8 @@ public class ClienteGeminiIA {
         sb.append("Produto: ").append(lote.getNomeProduto());
         sb.append(lote.isClimaterico() ? " (climatérico)" : " (não climatérico)").append("\n");
         sb.append("Dias de validade restantes: ").append(lote.getDiasValidadeRestantes()).append("\n");
+        sb.append("Temporada de demanda informada pelo gestor: ").append(lote.getTemporada()).append(". Não invente calendário agrícola.\n");
+        sb.append("Estoque mínimo: ").append(lote.getEstoqueMinimo()).append(". Recomende reposição se necessário.\n");
         sb.append("Estoque: ").append(lote.getQuantidadeEstoque()).append(" un\n");
         sb.append("Cenário: ").append(demanda.getDiaSemanaPt()).append(", ")
           .append(demanda.getHora()).append("h\n");
