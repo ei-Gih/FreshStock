@@ -1,13 +1,14 @@
-﻿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 try {
-    Set-Location -LiteralPath $PSScriptRoot
-    if (Test-Path -LiteralPath '.ia-key.xml') {
-        $cred = Import-Clixml -LiteralPath '.ia-key.xml'
-        $env:IA_API_KEY = $cred.GetNetworkCredential().Password
+    $python = Join-Path $PSScriptRoot '.venv\Scripts\pythonw.exe'
+    if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
+        throw 'Prepare o ambiente conforme o README.md.'
     }
-    $java = (Get-Command javaw.exe -ErrorAction Stop).Source
-    Start-Process -FilePath $java -ArgumentList '-Dfile.encoding=UTF-8 -jar FreshStock.jar' -WorkingDirectory $PSScriptRoot -WindowStyle Hidden
+    $app = Join-Path $PSScriptRoot 'app.py'
+    Start-Process -FilePath $python -ArgumentList ('"{0}"' -f $app) -WorkingDirectory $PSScriptRoot -WindowStyle Hidden
 } catch {
     Add-Type -AssemblyName System.Windows.Forms
-    [System.Windows.Forms.MessageBox]::Show('Não foi possível abrir. Verifique se o Java está instalado. ' + $_.Exception.Message, 'FreshStock')
+    [void][System.Windows.Forms.MessageBox]::Show(
+        'Confira a instalacao do FreshStock. ' + $_.Exception.Message,
+        'FreshStock')
 }

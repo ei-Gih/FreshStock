@@ -11,3 +11,6 @@ FreshStock.jar
 *.lock.db
 *.class
 .vscode/
+
+.venv/
+__pycache__/

@@ -1,7 +1,7 @@
 {
-    "java.project.sourcePaths": ["src"],
-    "java.project.outputPath": "bin",
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar"
-    ]
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "code-runner.executorMap": {
+        "python": "\"$workspaceRoot\\.venv\\Scripts\\python.exe\" -u $fullFileName"
+    },
+    "code-runner.runInTerminal": false
 }
